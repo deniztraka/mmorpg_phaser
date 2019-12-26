@@ -58,8 +58,10 @@ app.get('/game.html', passport.authenticate('jwt', {
     res.sendFile(__dirname + '/public/game.html');
 });
 
-app.get('/game.html', function(req, res) {
-    res.sendFile(__dirname + '/public/game.html');
+app.get('/lobby.html', passport.authenticate('jwt', {
+    session: false
+}), function(req, res) {
+    res.sendFile(__dirname + '/public/lobby.html');
 });
 
 app.use(express.static(__dirname + '/public'));
