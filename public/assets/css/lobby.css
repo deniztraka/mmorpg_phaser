@@ -42,3 +42,15 @@ code {
     font-weight: normal;
     margin-right: 10px;
 }
+
+.server-status {
+    font-size: 1em;
+}
+
+.server-status.online {
+    color: yellowgreen;
+}
+
+.server-status.offline {
+    color: red;
+}

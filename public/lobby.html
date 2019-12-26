@@ -5,7 +5,8 @@
     <meta charset="utf-8">
     <title>Leaderboard</title>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
     <link href="assets/css/lobby.css" rel="stylesheet">
     <script src="https://kit.fontawesome.com/ef079b4bad.js" crossorigin="anonymous"></script>
 </head>
@@ -17,9 +18,10 @@
         <!-- Fixed navbar -->
         <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
             <a class="navbar-brand" href="#">Server Lobby</a>
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
-  <span class="navbar-toggler-icon"></span>
-</button>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse"
+                aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
             <div class="collapse navbar-collapse" id="navbarCollapse">
 
                 <ul class="navbar-nav mr-auto">
@@ -37,10 +39,10 @@
                 </ul>
 
                 <span class="server-status-text">
-                  Status
+                    Status
                 </span>
-                <span style="font-size: 1em; color: greenyellow;">
-                  <i class="fas fa-globe"></i>
+                <span class="server-status online">
+                    <i class="fas fa-globe"></i>
                 </span>
 
                 <!--
@@ -57,9 +59,24 @@
     <main role="main" class="flex-shrink-0">
         <div class="container">
             <h1 class="mt-5">Welcome</h1>
-            <p class="lead"> <a href="/game.html">Just click to play!</a></p>
+            <div class="js-create-character-text">
+                <span class="">
+                    You don't have any characters yet.
+                </span>
+                <p class="lead">
+                    Create now to kick some ass!
+                </p>
+            </div>
 
-
+            <div class="js-select-character-text">
+                <p class="">
+                    
+                </p>
+                <p class="lead">
+                    Please choose a character to start kicking that bithcez!
+                </p>
+            </div>
+            
         </div>
     </main>
 
@@ -69,7 +86,10 @@
         </div>
     </footer>
     <script src="assets/js/refreshToken.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js" integrity="sha384-6khuMg9gaYr5AxOqhkVIODVIvm9ynTT5J4V1cfthmT+emCG6yVmEZsRHdxlotUnm" crossorigin="anonymous"></script>
+    <script src="assets/js/lobby.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"
+        integrity="sha384-6khuMg9gaYr5AxOqhkVIODVIvm9ynTT5J4V1cfthmT+emCG6yVmEZsRHdxlotUnm" crossorigin="anonymous">
+    </script>
 </body>
 
 </html>

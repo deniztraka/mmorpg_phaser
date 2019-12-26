@@ -23,8 +23,8 @@ function sendMessage() {
         message,
         refreshToken: getCookie('refreshJwt')
       },
-      success: function(data) {},
-      error: function(xhr) {
+      success: function (data) {},
+      error: function (xhr) {
         console.log(xhr);
       }
     })
@@ -265,11 +265,11 @@ class WorldScene extends Phaser.Scene {
     });
   }
 
-  moveEnemies () {
+  moveEnemies() {
     this.spawns.getChildren().forEach((enemy) => {
       const randNumber = Math.floor((Math.random() * 4) + 1);
 
-      switch(randNumber) {
+      switch (randNumber) {
         case 1:
           enemy.body.setVelocityX(50);
           break;
@@ -313,7 +313,10 @@ class WorldScene extends Phaser.Scene {
       });
       if (!occupied) validLocation = true;
     }
-    return { x, y };
+    return {
+      x,
+      y
+    };
   }
 
   onMeetEnemy(player, enemy) {
@@ -384,7 +387,11 @@ class WorldScene extends Phaser.Scene {
       var y = this.container.y;
       var flipX = this.player.flipX;
       if (this.container.oldPosition && (x !== this.container.oldPosition.x || y !== this.container.oldPosition.y || flipX !== this.container.oldPosition.flipX)) {
-        this.socket.emit('playerMovement', { x, y, flipX });
+        this.socket.emit('playerMovement', {
+          x,
+          y,
+          flipX
+        });
       }
       // save old position data
       this.container.oldPosition = {
@@ -418,4 +425,3 @@ var config = {
   ]
 };
 var game = new Phaser.Game(config);
-
