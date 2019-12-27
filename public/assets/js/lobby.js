@@ -32,15 +32,10 @@ Lobby.prototype.attachEvents = function() {
 Lobby.prototype.getCharacters = function() {
     $.ajax({
         url: "/getCharacters",
-        //contentType: "application/json;charset=utf-8",
-        data: {
-            email: "test1@gmail.com"
-        },
         success: function(data) {
-                $('.js-characters').html(data);
+            $('.js-characters').html(data);
 
-            } //,
-            //dataType: "json"
+        }
     });
 };
 

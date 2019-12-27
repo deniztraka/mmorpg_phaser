@@ -17,7 +17,7 @@ router.get('/getCharacters', asyncMiddleware(async(req, res, next) => {
     var queryObject = req.query;
     if (queryObject) {
         var characters = await CharacterModel.find({
-            email: queryObject.email
+            email: req.user.email
         }, {
             email: true,
             name: true,

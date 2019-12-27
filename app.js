@@ -5,6 +5,7 @@ var appRoot = require('app-root-path');
 var Logger = require(appRoot + "/common/logger");
 var logger = new Logger();
 
+const path = require('path');
 const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
@@ -42,6 +43,9 @@ const server = require('http').Server(app);
 const io = require('socket.io').listen(server);
 
 app.set('view engine', 'pug');
+app.set('views', [path.join(__dirname, 'views'),
+    path.join(__dirname, 'views/partials')
+]);
 
 
 // update express settings
