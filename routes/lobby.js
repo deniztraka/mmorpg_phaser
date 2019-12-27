@@ -14,7 +14,6 @@ router.post('/createCharacter', asyncMiddleware(async(req, res, next) => {
 
 
 router.get('/getCharacters', asyncMiddleware(async(req, res, next) => {
-    var queryObject = req.query;
     if (queryObject) {
         var characters = await CharacterModel.find({
             email: req.user.email
@@ -25,11 +24,6 @@ router.get('/getCharacters', asyncMiddleware(async(req, res, next) => {
         });
 
         res.render('characterList', { characterList: characters });
-
-        // res.status(200).json({
-        //     status: 'ok',
-        //     characters: characters
-        // });
     } else {
         res.status(400).json({
             status: 'bad request'

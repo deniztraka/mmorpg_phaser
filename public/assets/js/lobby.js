@@ -10,7 +10,6 @@ function Lobby() {
     self.init();
 
     self.getCharacters();
-
 }
 
 Lobby.prototype.init = function() {
