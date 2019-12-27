@@ -1,0 +1,16 @@
+if characterList && characterList.length
+    p Select any of your characters to play with!
+    #user-character-list
+        each character in characterList
+            div(class="user-character")
+                p(class="character-name")= character.name + " "
+                    |
+                    span(class="character-class")= character.class + " "
+                    |
+                    a(href="#" data-character-name=character.name class="js-play-with")="play!"
+else
+    span You don't have any characters yet.
+    a(href="/createCharacter" class="js-createCharacter")="Create new character!"
+
+
+

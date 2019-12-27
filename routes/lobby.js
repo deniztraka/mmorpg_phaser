@@ -4,16 +4,16 @@ const CharacterModel = require('../models/characterModel');
 
 const router = express.Router();
 
-router.post('/createCharacter', asyncMiddleware(async (req, res, next) => {
-    console.log(req.body);
-    //await CharacterModel.create({ email }, { name: score });
+router.post('/createCharacter', asyncMiddleware(async(req, res, next) => {
+    var createCharacterRequestBody = req.body;
+    await CharacterModel.create(createCharacterRequestBody);
     res.status(200).json({
         status: 'ok'
     });
 }));
 
 
-router.get('/getCharacters', asyncMiddleware(async (req, res, next) => {
+router.get('/getCharacters', asyncMiddleware(async(req, res, next) => {
     var queryObject = req.query;
     if (queryObject) {
         var characters = await CharacterModel.find({
@@ -24,17 +24,19 @@ router.get('/getCharacters', asyncMiddleware(async (req, res, next) => {
             class: true
         });
 
-        res.status(200).json({
-            status: 'ok',
-            characters: characters
-        });
-    }else{
+        res.render('characterList', { characterList: characters });
+
+        // res.status(200).json({
+        //     status: 'ok',
+        //     characters: characters
+        // });
+    } else {
         res.status(400).json({
             status: 'bad request'
         });
     }
 
-    
+
 }));
 
 

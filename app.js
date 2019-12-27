@@ -31,7 +31,7 @@ mongoose.connection.on('error', (error) => {
     logger.error("error on mongo connection", error);
     process.exit(1);
 });
-mongoose.connection.on('connected', function () {
+mongoose.connection.on('connected', function() {
     logger.info("connected to mongo");
 });
 mongoose.set('useFindAndModify', false);
@@ -41,6 +41,7 @@ const app = express();
 const server = require('http').Server(app);
 const io = require('socket.io').listen(server);
 
+app.set('view engine', 'pug');
 
 
 // update express settings
@@ -55,19 +56,19 @@ require('./auth/auth');
 
 app.get('/game.html', passport.authenticate('jwt', {
     session: false
-}), function (req, res) {
+}), function(req, res) {
     res.sendFile(__dirname + '/public/game.html');
 });
 
 app.get('/lobby.html', passport.authenticate('jwt', {
     session: false
-}), function (req, res) {
+}), function(req, res) {
     res.sendFile(__dirname + '/public/lobby.html');
 });
 
 app.use(express.static(__dirname + '/public'));
 
-app.get('/', function (req, res) {
+app.get('/', function(req, res) {
     res.sendFile(__dirname + '/index.html');
 });
 
@@ -83,7 +84,7 @@ app.use("/", passport.authenticate('jwt', {
 
 app.post('/submit-chatline', passport.authenticate('jwt', {
     session: false
-}), asyncMiddleware(async (req, res, next) => {
+}), asyncMiddleware(async(req, res, next) => {
     const {
         message
     } = req.body;

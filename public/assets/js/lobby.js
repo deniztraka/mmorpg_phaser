@@ -1,43 +1,70 @@
 function Lobby() {
     var self = this;
 
-    setInterval(function () {
-        self.checkServerStatus(function (status) {
+    setInterval(function() {
+        self.checkServerStatus(function(status) {
             self.setServerStatusIcon(status);
         })
     }, 10000);
 
+    self.init();
+
     self.getCharacters();
+
 }
 
-Lobby.prototype.getCharacters = function () {
+Lobby.prototype.init = function() {
+    this.attachEvents();
+};
+
+Lobby.prototype.attachEvents = function() {
+    var self = this;
+    $createCharacter = $(".js-createCharacter");
+    if ($createCharacter.length > 0) {
+        $createCharacter.on("click", function(e) {
+            e.preventDefault();
+
+            self.createCharacter();
+        });
+    }
+};
+
+Lobby.prototype.getCharacters = function() {
     $.ajax({
         url: "/getCharacters",
-        contentType: "application/json;charset=utf-8",
+        //contentType: "application/json;charset=utf-8",
         data: {
+            email: "test1@gmail.com"
+        },
+        success: function(data) {
+                $('.js-characters').html(data);
+
+            } //,
+            //dataType: "json"
+    });
+};
+
+Lobby.prototype.createCharacter = function() {
+    $.ajax({
+        type: "POST",
+        url: "/createCharacter",
+        contentType: "application/json;charset=utf-8",
+        data: JSON.stringify({
             email: "test1@gmail.com",
             name: "testCharacter",
             class: "warrior"
-        },
-        success: function (data) {
-            var $createCharacterText = $(".js-create-character-text");
-            var $selectCharacterText = $(".js-select-character-text");
-            if(data.characters && data.characters.lenght > 0){
-                $selectCharacterText.show();
-                $createCharacterText.hide();
-            }else{
-                $createCharacterText.show();
-                $selectCharacterText.hide();
-            }
+        }),
+        success: function(data) {
+            console.log(data);
         },
         dataType: "json"
     });
 };
 
-Lobby.prototype.checkServerStatus = function (recallFunc) {
+Lobby.prototype.checkServerStatus = function(recallFunc) {
     $.ajax({
         url: "/status",
-        success: function (data) {
+        success: function(data) {
             if (recallFunc != null) {
                 recallFunc(data.status === "ok");
             }
@@ -46,7 +73,7 @@ Lobby.prototype.checkServerStatus = function (recallFunc) {
     });
 };
 
-Lobby.prototype.setServerStatusIcon = function (status) {
+Lobby.prototype.setServerStatusIcon = function(status) {
     $serverStatus = $(".server-status");
     if (status) {
         if ($serverStatus.hasClass("offline")) {
