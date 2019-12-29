@@ -121,7 +121,7 @@ class WorldScene extends Phaser.Scene {
           player.setPosition(playerInfo.x, playerInfo.y);
         }
       }.bind(this));
-    }.bind(this));
+    }.bind(this));    
 
     this.socket.on('new message', (data) => {
       const usernameSpan = document.createElement('span');
@@ -333,15 +333,19 @@ class WorldScene extends Phaser.Scene {
 
       // Horizontal movement
       if (this.cursors.left.isDown) {
+        //todo:this.socket.emit('playerCommand', {key:"left"});
         this.container.body.setVelocityX(-80);
       } else if (this.cursors.right.isDown) {
+        //todo:this.socket.emit('playerCommand', {key:"right"});
         this.container.body.setVelocityX(80);
       }
 
       // Vertical movement
       if (this.cursors.up.isDown) {
+        //todo:this.socket.emit('playerCommand', {key:"up"});
         this.container.body.setVelocityY(-80);
       } else if (this.cursors.down.isDown) {
+        //todo:this.socket.emit('playerCommand', {key:"down"});
         this.container.body.setVelocityY(80);
       }
 

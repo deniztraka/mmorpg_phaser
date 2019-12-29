@@ -19,8 +19,9 @@ module.exports = Serv;
 function Serv(opts, io) {
     this.io = io;
     this.logger = new Logger();
-    this.players = {};
+    this.sockets = {};
     this.serverProcessFrequency = opts && opts.serverProcessFrequency ? opts.serverProcessFrequency : 1 / 60;
+    this.playerCommandQueu = [];
 
     this.lastTimeSeconds = 0;
     this.totalElapsedTimeFromSeconds = 0;
@@ -34,6 +35,7 @@ Serv.prototype.init = function () {
 
     this.io.on('connection', function (socket) {
 
+        self.sockets[socket.id] = socket;
         // add player to world
         self.world.addPlayer(socket.id);
 
@@ -47,8 +49,18 @@ Serv.prototype.init = function () {
         socket.on('disconnect', function () {
             self.world.removePlayer(socket.id);
 
+            delete this.sockets[socket.id];
+
             // emit a message to all players to remove this player
             self.io.emit('disconnect', socket.id);
+        });
+
+        //when a player command received
+        socket.on("playerCommand", function (commandData) {
+            self.playerCommandQueu.push({
+                socketId: socket.id,
+                data: commandData
+            });
         });
 
         // when a player moves, update the player data
@@ -75,14 +87,55 @@ Serv.prototype.mainLoop = function () {
     this.totalElapsedTimeFromSeconds += this.serverProcessFrequency;
     let deltaTime = this.totalElapsedTimeFromSeconds - this.lastTimeSeconds;
 
+
+    //todo:this.processCommandQueue();
     this.world.update(deltaTime);
 
     this.lastTimeSeconds = this.totalElapsedTimeFromSeconds;
+
+    utils.timerMechanics.executeByIntervalFromSeconds(this.serverProcessFrequency, this.totalElapsedTimeFromSeconds, 1, function () {
+        self.updateMovementDataOnClients();
+    });
+
     //total elapsed time logging
     utils.timerMechanics.executeByIntervalFromSeconds(this.serverProcessFrequency, this.totalElapsedTimeFromSeconds, 1,
         function () {
             self.logger.debug("Total elapsed time from seconds: " + Math.floor(self.totalElapsedTimeFromSeconds));
         });
+};
+
+Serv.prototype.updateMovementDataOnClients = function () {
+    var self = this;
+    for (var socketId in this.sockets) {
+        self.sockets[socketId].emit("playerMoved", self.world.getPlayer(socketId));
+    }
+};
+
+Serv.prototype.processCommandQueue = function () {
+    var count = this.playerCommandQueu.length;
+    for (let i = 0; i < count; i++) {
+        var clientCommand = this.playerCommandQueu.shift();
+        this.processCommand(clientCommand);
+    }
+    //this.logger.debug("Total command processed count: " + count);
+};
+
+Serv.prototype.processCommand = function (command) {
+    //this.logger.debug("Processed command: " + command.data.key);
+    switch (command.key) {
+        case "left":
+            this.world.players[command.socketId].x--;
+            break;
+        case "right":
+            this.world.players[command.socketId].x++;
+            break;
+        case "up":
+            this.world.players[command.socketId].y--;
+            break;
+        case "down":
+            this.world.players[command.socketId].y++;
+            break;
+    }
 };
 
 Serv.prototype.stop = function () {
