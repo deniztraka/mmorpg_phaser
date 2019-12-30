@@ -124,21 +124,7 @@ Serv.prototype.processCommandQueue = function () {
 
 Serv.prototype.processCommand = function (command) {
     var playerCommand = this.playerCommandFactory.getCommand(command.data.key, command.socketId);
-    playerCommand.execute();
-    switch (command.data.key) {
-        case "left":
-            this.world.players[command.socketId].x = this.world.players[command.socketId].x - 1;
-            break;
-        case "right":
-            this.world.players[command.socketId].x = this.world.players[command.socketId].x + 1;
-            break;
-        case "up":
-            this.world.players[command.socketId].y = this.world.players[command.socketId].y - 1;
-            break;
-        case "down":
-            this.world.players[command.socketId].y = this.world.players[command.socketId].y + 1;
-            break;
-    }
+    playerCommand.execute();    
 };
 
 Serv.prototype.stop = function () {
