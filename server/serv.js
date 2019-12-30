@@ -2,6 +2,7 @@ const appRoot = require('app-root-path');
 var Logger = require(appRoot + "/common/logger");
 const utils = require(appRoot + "/common/utils");
 const World = require(appRoot + "/server/world");
+const PlayerCommandFactory = require(appRoot + "/server/commands/playerCommandFactory");
 
 /**
  * Module exports.
@@ -21,7 +22,9 @@ function Serv(opts, io) {
     this.logger = new Logger();
     this.sockets = {};
     this.serverProcessFrequency = opts && opts.serverProcessFrequency ? opts.serverProcessFrequency : 1 / 60;
+
     this.playerCommandQueu = [];
+    this.playerCommandFactory = new PlayerCommandFactory(this);
 
     this.lastTimeSeconds = 0;
     this.totalElapsedTimeFromSeconds = 0;
@@ -62,14 +65,6 @@ Serv.prototype.init = function () {
                 data: commandData
             });
         });
-
-        // when a player moves, update the player data
-        // socket.on('playerMovement', function (movementData) {
-        //     self.world.updatePlayerMovementData(socket.id, movementData);
-
-        //     // emit a message to all players about the player that moved
-        //     socket.broadcast.emit('playerMoved', self.world.getPlayer(socket.id));
-        // });
     });
 };
 
@@ -108,7 +103,7 @@ Serv.prototype.updateMovementDataOnClients = function () {
     var self = this;
     for (var socketId in this.sockets) {
         //get playerdata on this socketId
-        var player = self.world.getPlayer(socketId);        
+        var player = self.world.getPlayer(socketId);
 
         //emit to current player that it is moved
         self.sockets[socketId].emit("playerMoved", player);
@@ -128,7 +123,8 @@ Serv.prototype.processCommandQueue = function () {
 };
 
 Serv.prototype.processCommand = function (command) {
-    //this.logger.debug("Processed command: " + command.data.key);    
+    var playerCommand = this.playerCommandFactory.getCommand(command.data.key, command.socketId);
+    playerCommand.execute();
     switch (command.data.key) {
         case "left":
             this.world.players[command.socketId].x = this.world.players[command.socketId].x - 1;
