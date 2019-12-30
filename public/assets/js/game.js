@@ -114,14 +114,18 @@ class WorldScene extends Phaser.Scene {
       }.bind(this));
     }.bind(this));
 
-    this.socket.on('playerMoved', function (playerInfo) {
+    this.socket.on('playerMoved', function (playerInfo) {  
+      this.container.setPosition(playerInfo.x, playerInfo.y);      
+    }.bind(this));
+
+    this.socket.on('otherPlayerMoved', function (playerInfo) {
       this.otherPlayers.getChildren().forEach(function (player) {
         if (playerInfo.playerId === player.playerId) {
           player.flipX = playerInfo.flipX;
           player.setPosition(playerInfo.x, playerInfo.y);
         }
       }.bind(this));
-    }.bind(this));    
+    }.bind(this));
 
     this.socket.on('new message', (data) => {
       const usernameSpan = document.createElement('span');
@@ -333,20 +337,28 @@ class WorldScene extends Phaser.Scene {
 
       // Horizontal movement
       if (this.cursors.left.isDown) {
-        //todo:this.socket.emit('playerCommand', {key:"left"});
-        this.container.body.setVelocityX(-80);
+        this.socket.emit('playerCommand', {
+          key: "left"
+        });
+        this.container.body.setVelocityX(-60);
       } else if (this.cursors.right.isDown) {
-        //todo:this.socket.emit('playerCommand', {key:"right"});
-        this.container.body.setVelocityX(80);
+        this.socket.emit('playerCommand', {
+          key: "right"
+        });
+        this.container.body.setVelocityX(60);
       }
 
       // Vertical movement
       if (this.cursors.up.isDown) {
-        //todo:this.socket.emit('playerCommand', {key:"up"});
-        this.container.body.setVelocityY(-80);
+        this.socket.emit('playerCommand', {
+          key: "up"
+        });
+        this.container.body.setVelocityY(-60);
       } else if (this.cursors.down.isDown) {
-        //todo:this.socket.emit('playerCommand', {key:"down"});
-        this.container.body.setVelocityY(80);
+        this.socket.emit('playerCommand', {
+          key: "down"
+        });
+        this.container.body.setVelocityY(60);
       }
 
       // Update the animation last and give left/right animations precedence over up/down animations

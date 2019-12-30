@@ -49,7 +49,7 @@ Serv.prototype.init = function () {
         socket.on('disconnect', function () {
             self.world.removePlayer(socket.id);
 
-            delete this.sockets[socket.id];
+            delete self.sockets[socket.id];
 
             // emit a message to all players to remove this player
             self.io.emit('disconnect', socket.id);
@@ -64,12 +64,12 @@ Serv.prototype.init = function () {
         });
 
         // when a player moves, update the player data
-        socket.on('playerMovement', function (movementData) {
-            self.world.updatePlayerMovementData(socket.id, movementData);
+        // socket.on('playerMovement', function (movementData) {
+        //     self.world.updatePlayerMovementData(socket.id, movementData);
 
-            // emit a message to all players about the player that moved
-            socket.broadcast.emit('playerMoved', self.world.getPlayer(socket.id));
-        });
+        //     // emit a message to all players about the player that moved
+        //     socket.broadcast.emit('playerMoved', self.world.getPlayer(socket.id));
+        // });
     });
 };
 
@@ -88,7 +88,7 @@ Serv.prototype.mainLoop = function () {
     let deltaTime = this.totalElapsedTimeFromSeconds - this.lastTimeSeconds;
 
 
-    //todo:this.processCommandQueue();
+    this.processCommandQueue();
     this.world.update(deltaTime);
 
     this.lastTimeSeconds = this.totalElapsedTimeFromSeconds;
@@ -107,7 +107,14 @@ Serv.prototype.mainLoop = function () {
 Serv.prototype.updateMovementDataOnClients = function () {
     var self = this;
     for (var socketId in this.sockets) {
-        self.sockets[socketId].emit("playerMoved", self.world.getPlayer(socketId));
+        //get playerdata on this socketId
+        var player = self.world.getPlayer(socketId);        
+
+        //emit to current player that it is moved
+        self.sockets[socketId].emit("playerMoved", player);
+
+        //inform other sockets about current player
+        self.sockets[socketId].broadcast.emit('otherPlayerMoved', player);
     }
 };
 
@@ -121,19 +128,19 @@ Serv.prototype.processCommandQueue = function () {
 };
 
 Serv.prototype.processCommand = function (command) {
-    //this.logger.debug("Processed command: " + command.data.key);
-    switch (command.key) {
+    //this.logger.debug("Processed command: " + command.data.key);    
+    switch (command.data.key) {
         case "left":
-            this.world.players[command.socketId].x--;
+            this.world.players[command.socketId].x = this.world.players[command.socketId].x - 1;
             break;
         case "right":
-            this.world.players[command.socketId].x++;
+            this.world.players[command.socketId].x = this.world.players[command.socketId].x + 1;
             break;
         case "up":
-            this.world.players[command.socketId].y--;
+            this.world.players[command.socketId].y = this.world.players[command.socketId].y - 1;
             break;
         case "down":
-            this.world.players[command.socketId].y++;
+            this.world.players[command.socketId].y = this.world.players[command.socketId].y + 1;
             break;
     }
 };
