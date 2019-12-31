@@ -8,10 +8,16 @@ var BaseCommand = require(appRoot + "/server/commands/baseCommand");
 
 module.exports = LeftKeyPressedCommand;
 
-function LeftKeyPressedCommand(server, socketId){
+function LeftKeyPressedCommand(server, socketId) {
     var self = this;
-    BaseCommand.call(this, server, socketId, function(){        
-        self.server.world.players[self.socketId].x = self.server.world.players[self.socketId].x - 1;
+    BaseCommand.call(this, server, socketId, function() {
+        var player = self.server.world.getPlayer(self.socketId);
+        var currentPosition = player.getPosition();
+        var updatedPosition = {
+            x: currentPosition.x - 1,
+            y: currentPosition.y
+        };
+        self.server.world.updatePlayerMovementData(self.socketId, updatedPosition)
     });
 }
 

@@ -7,7 +7,7 @@ if characterList && characterList.length
                     |
                     span(class="character-class")= character.class + " "
                     |
-                    a(href="#" data-character-name=character.name class="js-play-with")="play!"
+                    a(href="/game.html" data-character-name=character.name class="js-play-with")="play!"
 else
     p You don't have any characters yet.
     a(href="/createCharacter" class="js-createCharacter")="Create new character!"

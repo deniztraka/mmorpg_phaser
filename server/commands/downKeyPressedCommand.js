@@ -10,8 +10,14 @@ module.exports = DownKeyPressedCommand;
 
 function DownKeyPressedCommand(server, socketId) {
     var self = this;
-    BaseCommand.call(this, server, socketId, function () {        
-        self.server.world.players[self.socketId].y = self.server.world.players[self.socketId].y + 1;
+    BaseCommand.call(this, server, socketId, function() {
+        var player = self.server.world.getPlayer(self.socketId);
+        var currentPosition = player.getPosition();
+        var updatedPosition = {
+            x: currentPosition.x,
+            y: currentPosition.y + 1
+        };
+        self.server.world.updatePlayerMovementData(self.socketId, updatedPosition)
     });
 }
 

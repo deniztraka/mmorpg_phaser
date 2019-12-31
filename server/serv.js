@@ -33,10 +33,10 @@ function Serv(opts, io) {
     this.init();
 }
 
-Serv.prototype.init = function () {
+Serv.prototype.init = function() {
     let self = this;
 
-    this.io.on('connection', function (socket) {
+    this.io.on('connection', function(socket) {
 
         self.sockets[socket.id] = socket;
         // add player to world
@@ -49,7 +49,7 @@ Serv.prototype.init = function () {
         socket.broadcast.emit('newPlayer', self.world.getPlayer(socket.id));
 
         // when a player disconnects, remove them from our world
-        socket.on('disconnect', function () {
+        socket.on('disconnect', function() {
             self.world.removePlayer(socket.id);
 
             delete self.sockets[socket.id];
@@ -59,7 +59,7 @@ Serv.prototype.init = function () {
         });
 
         //when a player command received
-        socket.on("playerCommand", function (commandData) {
+        socket.on("playerCommand", function(commandData) {
             self.playerCommandQueu.push({
                 socketId: socket.id,
                 data: commandData
@@ -68,15 +68,15 @@ Serv.prototype.init = function () {
     });
 };
 
-Serv.prototype.start = function () {
+Serv.prototype.start = function() {
     let self = this;
 
-    self.timer = setInterval(function () {
+    self.timer = setInterval(function() {
         self.mainLoop();
     }, 1000 * self.serverProcessFrequency);
 };
 
-Serv.prototype.mainLoop = function () {
+Serv.prototype.mainLoop = function() {
     let self = this;
 
     this.totalElapsedTimeFromSeconds += this.serverProcessFrequency;
@@ -84,36 +84,39 @@ Serv.prototype.mainLoop = function () {
 
 
     this.processCommandQueue();
+
+    utils.timerMechanics.executeByIntervalFromSeconds(this.serverProcessFrequency, this.totalElapsedTimeFromSeconds, 1 / 10, function() {
+        self.updateMovementDataOnClients();
+    });
+
     this.world.update(deltaTime);
 
     this.lastTimeSeconds = this.totalElapsedTimeFromSeconds;
 
-    utils.timerMechanics.executeByIntervalFromSeconds(this.serverProcessFrequency, this.totalElapsedTimeFromSeconds, 1, function () {
-        self.updateMovementDataOnClients();
-    });
-
     //total elapsed time logging
     utils.timerMechanics.executeByIntervalFromSeconds(this.serverProcessFrequency, this.totalElapsedTimeFromSeconds, 1,
-        function () {
+        function() {
             self.logger.debug("Total elapsed time from seconds: " + Math.floor(self.totalElapsedTimeFromSeconds));
         });
 };
 
-Serv.prototype.updateMovementDataOnClients = function () {
+Serv.prototype.updateMovementDataOnClients = function() {
     var self = this;
     for (var socketId in this.sockets) {
         //get playerdata on this socketId
         var player = self.world.getPlayer(socketId);
 
-        //emit to current player that it is moved
-        self.sockets[socketId].emit("playerMoved", player);
+        if (player.isPositionChanged()) {
+            //emit to current player that it is moved
+            self.sockets[socketId].emit("playerMoved", player);
 
-        //inform other sockets about current player
-        self.sockets[socketId].broadcast.emit('otherPlayerMoved', player);
+            //inform other sockets about current player
+            self.sockets[socketId].broadcast.emit('otherPlayerMoved', player);
+        }
     }
 };
 
-Serv.prototype.processCommandQueue = function () {
+Serv.prototype.processCommandQueue = function() {
     var count = this.playerCommandQueu.length;
     for (let i = 0; i < count; i++) {
         var clientCommand = this.playerCommandQueu.shift();
@@ -122,11 +125,11 @@ Serv.prototype.processCommandQueue = function () {
     //this.logger.debug("Total command processed count: " + count);
 };
 
-Serv.prototype.processCommand = function (command) {
+Serv.prototype.processCommand = function(command) {
     var playerCommand = this.playerCommandFactory.getCommand(command.data.key, command.socketId);
-    playerCommand.execute();    
+    playerCommand.execute();
 };
 
-Serv.prototype.stop = function () {
+Serv.prototype.stop = function() {
     clearInterval(this.timer);
 };

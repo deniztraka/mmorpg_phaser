@@ -1,5 +1,6 @@
 const appRoot = require('app-root-path');
 var Logger = require(appRoot + "/common/logger");
+var Player = require(appRoot + "/server/player");
 //const utils = require(appRoot + "/common/utils");
 
 /**
@@ -21,41 +22,51 @@ function World(opts) {
     this.init();
 }
 
-World.prototype.init = function () {
+World.prototype.init = function() {
     let self = this;
 };
 
-World.prototype.update = function (deltaTime) {
+World.prototype.update = function(deltaTime) {
     let self = this;
-    //self.logger.debug("world update: " + deltaTime);
+
+
+    //check movement and update old position
+    for (var playerId in this.players) {
+        //get playerdata on this socketId
+        if (this.players[playerId].isPositionChanged()) {
+            //update oldPosition
+            this.players[playerId].oldPosition = this.players[playerId].position;
+        }
+    }
 };
 
-World.prototype.addPlayer = function (socketId) {
-    this.players[socketId] = {
-        flipX: false,
-        x: Math.floor(Math.random() * 400) + 50,
-        y: Math.floor(Math.random() * 500) + 50,
-        playerId: socketId
-    };
+World.prototype.addPlayer = function(socketId) {
+    var randomX = Math.floor(Math.random() * 400) + 50;
+    var randomY = Math.floor(Math.random() * 500) + 50;
+    this.players[socketId] = new Player(socketId, randomX, randomY);
+
     this.logger.info("a user connected: " + socketId);
     return this.players[socketId];
 };
 
-World.prototype.removePlayer = function (socketId) {
+World.prototype.removePlayer = function(socketId) {
     delete this.players[socketId];
-    this.logger.info("user removed from world: " + socketId);    
+    this.logger.info("user removed from world: " + socketId);
 };
 
-World.prototype.getPlayers = function () {
+World.prototype.getPlayers = function() {
     return this.players;
 };
 
-World.prototype.getPlayer = function (socketId) {
+World.prototype.getPlayer = function(socketId) {
     return this.players[socketId];
 };
 
-World.prototype.updatePlayerMovementData = function (socketId, movementData) {
-    this.players[socketId].x = movementData.x;
-    this.players[socketId].y = movementData.y;
+World.prototype.updatePlayerMovementData = function(socketId, movementData) {
+    this.players[socketId].setOldPosition(this.players[socketId].getPosition());
+    this.players[socketId].setPosition({
+        x: movementData.x,
+        y: movementData.y
+    });
     this.players[socketId].flipX = movementData.flipX;
 }
