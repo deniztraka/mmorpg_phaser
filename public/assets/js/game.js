@@ -116,7 +116,15 @@ class WorldScene extends Phaser.Scene {
 
         this.socket.on('playerMoved', function(playerInfo) {
             console.log("current player moved");
-            this.container.setPosition(playerInfo.position.x, playerInfo.position.y);
+            this.tweens.add({
+                targets: this.container,
+                x: playerInfo.position.x,
+                y: playerInfo.position.y,
+                duration: 250,
+                repeat: false,
+                ease: "Linear"
+            });
+            //this.container.setPosition(playerInfo.position.x, playerInfo.position.y);
         }.bind(this));
 
         this.socket.on('otherPlayerMoved', function(playerInfo) {
@@ -124,7 +132,15 @@ class WorldScene extends Phaser.Scene {
             this.otherPlayers.getChildren().forEach(function(player) {
                 if (playerInfo.id === player.playerId) {
                     player.flipX = playerInfo.flipX;
-                    player.setPosition(playerInfo.position.x, playerInfo.position.y);
+                    //player.setPosition(playerInfo.position.x, playerInfo.position.y);
+                    this.tweens.add({
+                        targets: player,
+                        x: playerInfo.position.x,
+                        y: playerInfo.position.y,
+                        duration: 250,
+                        repeat: false,
+                        ease: "Linear"
+                    });
                 }
             }.bind(this));
         }.bind(this));

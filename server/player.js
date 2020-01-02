@@ -33,7 +33,6 @@ Player.prototype.setPosition = function(position) {
     this.position = position;
 };
 
-
 Player.prototype.getOldPosition = function() {
     return this.oldPosition;
 };
