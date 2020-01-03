@@ -61,16 +61,16 @@ require('./auth/auth');
 app.get('/game.html', passport.authenticate('jwt', {
     session: false
 }), function(req, res) {
-    res.sendFile(__dirname + '/public/game.html');
+    res.sendFile(__dirname + '/dist/game.html');
 });
 
 app.get('/lobby.html', passport.authenticate('jwt', {
     session: false
 }), function(req, res) {
-    res.sendFile(__dirname + '/public/lobby.html');
+    res.sendFile(__dirname + '/dist/lobby.html');
 });
 
-app.use(express.static(__dirname + '/public'));
+app.use(express.static(__dirname + '/dist'));
 
 app.get('/', function(req, res) {
     res.sendFile(__dirname + '/index.html');
