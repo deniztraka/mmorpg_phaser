@@ -8,6 +8,7 @@ export class WorldScene extends Phaser.Scene {
     create() {
         this.socket = io();
         this.otherPlayers = this.physics.add.group();
+        //this.lastMoveTime = 0;
 
         // create map
         this.createMap();
@@ -18,12 +19,17 @@ export class WorldScene extends Phaser.Scene {
         // user input
         this.cursors = this.input.keyboard.createCursorKeys();
 
+        this.lastInputBroadcastTime = 0;
+        this.inputBroadcastFrequency = 1000 / 10;
+
+        this.playerCommandQueue = [];
+
         // create enemies
         //this.createEnemies();
 
         // listen for web socket events
-        this.socket.on('currentPlayers', function(players) {
-            Object.keys(players).forEach(function(id) {
+        this.socket.on('currentPlayers', function (players) {
+            Object.keys(players).forEach(function (id) {
                 if (players[id].id === this.socket.id) {
                     this.createPlayer(players[id]);
                 } else {
@@ -32,44 +38,46 @@ export class WorldScene extends Phaser.Scene {
             }.bind(this));
         }.bind(this));
 
-        this.socket.on('newPlayer', function(playerInfo) {
+        this.socket.on('newPlayer', function (playerInfo) {
             this.addOtherPlayers(playerInfo);
         }.bind(this));
 
-        this.socket.on('disconnect', function(playerId) {
-            this.otherPlayers.getChildren().forEach(function(player) {
+        this.socket.on('disconnect', function (playerId) {
+            this.otherPlayers.getChildren().forEach(function (player) {
                 if (playerId === player.playerId) {
                     player.destroy();
                 }
             }.bind(this));
         }.bind(this));
 
-        this.socket.on('playerMoved', function(playerInfo) {
-            //console.log("current player moved!!");
+        this.socket.on('playerMoved', function (playerInfo) {
+            // console.log("current player moved!!");
+            // console.log(this.elapsTime - this.lastMoveTime);
             this.tweens.add({
                 targets: this.container,
                 x: playerInfo.position.x,
                 y: playerInfo.position.y,
-                duration: 250,
+                duration: 100,
                 repeat: false,
                 ease: "Linear"
             });
             //this.container.setPosition(playerInfo.position.x, playerInfo.position.y);
+            //this.lastMoveTime = this.elapsTime;                        
         }.bind(this));
 
-        this.socket.on('otherPlayerMoved', function(playerInfo) {
+        this.socket.on('otherPlayerMoved', function (playerInfo) {
             //console.log("other player moved");
-            this.otherPlayers.getChildren().forEach(function(player) {
-                if (playerInfo.id === player.playerId) {                    
+            this.otherPlayers.getChildren().forEach(function (player) {
+                if (playerInfo.id === player.playerId) {
                     //player.setPosition(playerInfo.position.x, playerInfo.position.y);
                     this.tweens.add({
                         targets: player,
                         x: playerInfo.position.x,
                         y: playerInfo.position.y,
-                        duration: 250,
+                        duration: 100,
                         repeat: false,
                         ease: "Linear"
-                    });
+                    });                    
                 }
             }.bind(this));
         }.bind(this));
@@ -117,7 +125,7 @@ export class WorldScene extends Phaser.Scene {
         this.anims.create({
             key: 'left',
             frames: this.anims.generateFrameNumbers('pixelman', {
-                frames: [7,8]
+                frames: [7, 8]
             }),
             frameRate: 9,
             repeat: -1
@@ -127,7 +135,7 @@ export class WorldScene extends Phaser.Scene {
         this.anims.create({
             key: 'right',
             frames: this.anims.generateFrameNumbers('pixelman', {
-                frames: [4,5]
+                frames: [4, 5]
             }),
             frameRate: 9,
             repeat: -1
@@ -136,7 +144,7 @@ export class WorldScene extends Phaser.Scene {
         this.anims.create({
             key: 'up',
             frames: this.anims.generateFrameNumbers('pixelman', {
-                frames: [10,11]
+                frames: [10, 11]
             }),
             frameRate: 9,
             repeat: -1
@@ -145,7 +153,7 @@ export class WorldScene extends Phaser.Scene {
         this.anims.create({
             key: 'down',
             frames: this.anims.generateFrameNumbers('pixelman', {
-                frames: [1,2]
+                frames: [1, 2]
             }),
             frameRate: 9,
             repeat: -1
@@ -278,34 +286,48 @@ export class WorldScene extends Phaser.Scene {
         }
     }
 
-    update() {
+    update(time, delta) {
+
+
         if (this.container) {
-            this.container.body.setVelocity(0);
+            //this.container.body.setVelocity(0);
 
             // Horizontal movement
             if (this.cursors.left.isDown) {
-                this.socket.emit('playerCommand', {
+                this.playerCommandQueue.push({
                     key: "left"
                 });
-                this.container.body.setVelocityX(-60);
+                // this.socket.emit('playerCommand', {
+                //     key: "left"
+                // });
+                //this.container.body.setVelocityX(-60);
             } else if (this.cursors.right.isDown) {
-                this.socket.emit('playerCommand', {
+                // this.socket.emit('playerCommand', {
+                //     key: "right"
+                // });
+                this.playerCommandQueue.push({
                     key: "right"
                 });
-                this.container.body.setVelocityX(60);
+                //this.container.body.setVelocityX(60);
             }
 
             // Vertical movement
             if (this.cursors.up.isDown) {
-                this.socket.emit('playerCommand', {
+                // this.socket.emit('playerCommand', {
+                //     key: "up"
+                // });
+                this.playerCommandQueue.push({
                     key: "up"
                 });
-                this.container.body.setVelocityY(-60);
+                //this.container.body.setVelocityY(-60);
             } else if (this.cursors.down.isDown) {
-                this.socket.emit('playerCommand', {
+                // this.socket.emit('playerCommand', {
+                //     key: "down"
+                // });
+                this.playerCommandQueue.push({
                     key: "down"
                 });
-                this.container.body.setVelocityY(60);
+                //this.container.body.setVelocityY(60);
             }
 
             // Update the animation last and give left/right animations precedence over up/down animations
@@ -346,17 +368,26 @@ export class WorldScene extends Phaser.Scene {
             // emit player movement
             var x = this.container.x;
             var y = this.container.y;
-            if (this.container.oldPosition && (x !== this.container.oldPosition.x || y !== this.container.oldPosition.y)) {
-                this.socket.emit('playerMovement', {
-                    x,
-                    y
-                });
-            }
+            // if (this.container.oldPosition && (x !== this.container.oldPosition.x || y !== this.container.oldPosition.y)) {
+            //     this.socket.emit('playerMovement', {
+            //         x,
+            //         y
+            //     });
+            // }
             // save old position data
             this.container.oldPosition = {
                 x: this.container.x,
                 y: this.container.y
             };
         }
+
+        //send commands by current player
+        if (time > this.lastInputBroadcastTime + this.inputBroadcastFrequency) {            
+            this.socket.emit('playerCommands', this.playerCommandQueue);
+            this.playerCommandQueue = [];
+            this.lastInputBroadcastTime = time;
+        }
+
+        //this.elapsTime = time;
     }
 }
