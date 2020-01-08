@@ -21,8 +21,6 @@ function Player(id, _x, _y) {
         x: _x,
         y: _y
     };
-
-    this.flipX = false;
 };
 
 Player.prototype.getPosition = function() {

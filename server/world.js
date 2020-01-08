@@ -67,6 +67,5 @@ World.prototype.updatePlayerMovementData = function(socketId, movementData) {
     this.players[socketId].setPosition({
         x: movementData.x,
         y: movementData.y
-    });
-    this.players[socketId].flipX = movementData.flipX;
+    });    
 }

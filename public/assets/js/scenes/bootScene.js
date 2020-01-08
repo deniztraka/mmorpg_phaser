@@ -17,6 +17,11 @@ export class BootScene extends Phaser.Scene {
             frameHeight: 16
         });
 
+        this.load.spritesheet('pixelman', 'assets/pixelman.png', {
+            frameWidth: 32,
+            frameHeight: 32
+        });
+
         this.load.image('golem', 'assets/images/coppergolem.png');
         this.load.image('ent', 'assets/images/dark-ent.png');
         this.load.image('demon', 'assets/images/demon.png');
