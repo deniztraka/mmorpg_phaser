@@ -290,44 +290,36 @@ export class WorldScene extends Phaser.Scene {
 
 
         if (this.container) {
-            //this.container.body.setVelocity(0);
+            this.container.body.setVelocity(0);
 
             // Horizontal movement
             if (this.cursors.left.isDown) {
                 this.playerCommandQueue.push({
                     key: "left"
                 });
-                // this.socket.emit('playerCommand', {
-                //     key: "left"
-                // });
-                //this.container.body.setVelocityX(-60);
+                
+                this.container.body.setVelocityX(-60);
             } else if (this.cursors.right.isDown) {
-                // this.socket.emit('playerCommand', {
-                //     key: "right"
-                // });
+                
                 this.playerCommandQueue.push({
                     key: "right"
                 });
-                //this.container.body.setVelocityX(60);
+                this.container.body.setVelocityX(60);
             }
 
             // Vertical movement
             if (this.cursors.up.isDown) {
-                // this.socket.emit('playerCommand', {
-                //     key: "up"
-                // });
+                
                 this.playerCommandQueue.push({
                     key: "up"
                 });
-                //this.container.body.setVelocityY(-60);
+                this.container.body.setVelocityY(-60);
             } else if (this.cursors.down.isDown) {
-                // this.socket.emit('playerCommand', {
-                //     key: "down"
-                // });
+                
                 this.playerCommandQueue.push({
                     key: "down"
                 });
-                //this.container.body.setVelocityY(60);
+                this.container.body.setVelocityY(60);
             }
 
             // Update the animation last and give left/right animations precedence over up/down animations
@@ -365,15 +357,6 @@ export class WorldScene extends Phaser.Scene {
                 }
             }
 
-            // emit player movement
-            var x = this.container.x;
-            var y = this.container.y;
-            // if (this.container.oldPosition && (x !== this.container.oldPosition.x || y !== this.container.oldPosition.y)) {
-            //     this.socket.emit('playerMovement', {
-            //         x,
-            //         y
-            //     });
-            // }
             // save old position data
             this.container.oldPosition = {
                 x: this.container.x,
